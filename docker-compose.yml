@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: dtc-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: textbook_compiler
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: ./infra/docker/Dockerfile.api
+    container_name: dtc-api
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/textbook_compiler?schema=public
+      JWT_SECRET: super-secret-jwt-key-change-in-production
+      PORT: 3000
+      HOST: 0.0.0.0
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/api:/app/apps/api
+      - ./packages:/app/packages
+      - /app/node_modules
+      - /app/apps/api/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "cd apps/api && npx prisma migrate deploy && npx prisma generate && pnpm dev"
+
+  web:
+    build:
+      context: .
+      dockerfile: ./infra/docker/Dockerfile.web
+    container_name: dtc-web
+    environment:
+      VITE_API_URL: http://localhost:3000
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./apps/web:/app/apps/web
+      - ./packages:/app/packages
+      - /app/node_modules
+      - /app/apps/web/node_modules
+    depends_on:
+      - api
+    command: sh -c "cd apps/web && pnpm dev --host"
+
+volumes:
+  postgres_data:
+

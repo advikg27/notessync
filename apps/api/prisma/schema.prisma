@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String    @id @default(cuid())
+  name                  String
+  email                 String    @unique
+  passwordHash          String
+  emailVerified         Boolean   @default(false)
+  verificationCode      String?
+  verificationExpiry    DateTime?
+  resetCode             String?
+  resetCodeExpiry       DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  ownedCourses     Course[]             @relation("CourseOwner")
+  modules          Module[]
+  courseMemberships CourseMembership[]
+
+  @@map("users")
+}
+
+model Course {
+  id        String   @id @default(cuid())
+  name      String
+  ownerId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner       User               @relation("CourseOwner", fields: [ownerId], references: [id])
+  modules     Module[]
+  memberships CourseMembership[]
+
+  @@map("courses")
+}
+
+enum CourseRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model CourseMembership {
+  id        String     @id @default(cuid())
+  userId    String
+  courseId  String
+  role      CourseRole @default(MEMBER)
+  createdAt DateTime   @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])
+  @@map("course_memberships")
+}
+
+model Module {
+  id        String   @id @default(cuid())
+  courseId  String
+  authorId  String
+  type      String // definition, example, explanation, diagram, proof, problem
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course            Course             @relation(fields: [courseId], references: [id])
+  author            User               @relation(fields: [authorId], references: [id])
+  versions          ModuleVersion[]
+  tags              ModuleTag[]
+  outgoingRefs      ModuleReference[]  @relation("SourceModule")
+  incomingRefs      ModuleReference[]  @relation("TargetModule")
+
+  @@map("modules")
+}
+
+model ModuleVersion {
+  id              String   @id @default(cuid())
+  moduleId        String
+  versionNumber   Int
+  contentMarkdown String   @db.Text
+  contentHtml     String?  @db.Text
+  createdAt       DateTime @default(now())
+
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([moduleId, versionNumber])
+  @@map("module_versions")
+}
+
+model ModuleTag {
+  id       String @id @default(cuid())
+  moduleId String
+  tag      String
+
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([moduleId, tag])
+  @@map("module_tags")
+}
+
+model ModuleReference {
+  id                  String @id @default(cuid())
+  sourceModuleId      String
+  referencedModuleId  String
+
+  sourceModule     Module @relation("SourceModule", fields: [sourceModuleId], references: [id], onDelete: Cascade)
+  referencedModule Module @relation("TargetModule", fields: [referencedModuleId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceModuleId, referencedModuleId])
+  @@map("module_references")
+}
+
