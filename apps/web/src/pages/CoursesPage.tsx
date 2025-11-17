@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { courseApi } from '../utils/api';
-import { FiPlus, FiBook, FiUsers, FiFileText, FiCopy, FiCheck, FiShield, FiAward } from 'react-icons/fi';
+import { FiPlus, FiBook, FiUsers, FiFileText, FiCopy, FiCheck, FiShield, FiAward, FiZap } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 
 // Role badge component
 function RoleBadge({ role }: { role: string }) {
   if (role === 'OWNER') {
     return (
-      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-violet-500/20 to-purple-500/20 text-violet-300 border border-violet-500/30 shadow-lg">
         <FiAward className="w-3 h-3 mr-1" />
         Owner
       </span>
@@ -17,14 +17,14 @@ function RoleBadge({ role }: { role: string }) {
   }
   if (role === 'ADMIN') {
     return (
-      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-300 border border-blue-500/30 shadow-lg">
         <FiShield className="w-3 h-3 mr-1" />
         Admin
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-gray-500/20 to-slate-500/20 text-gray-300 border border-gray-500/30 shadow-lg">
       <FiUsers className="w-3 h-3 mr-1" />
       Member
     </span>
@@ -96,48 +96,50 @@ export function CoursesPage() {
   const courses = coursesData?.data?.courses || [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Courses</h1>
-          <p className="text-gray-600 mt-1">
-            Manage your courses and create collaborative textbooks
-          </p>
-        </div>
-        <div className="flex space-x-3">
-          <button
-            onClick={() => setShowJoinCourse(true)}
-            className="flex items-center space-x-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700"
-          >
-            <FiUsers className="w-5 h-5" />
-            <span>Join Course</span>
-          </button>
-          <button
-            onClick={() => setShowCreateCourse(true)}
-            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-          >
-            <FiPlus className="w-5 h-5" />
-            <span>New Course</span>
-          </button>
+      <div className="card p-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-2">My Courses</h1>
+            <p className="text-gray-400 text-lg">
+              Manage your courses and create collaborative textbooks
+            </p>
+          </div>
+          <div className="flex space-x-3">
+            <button
+              onClick={() => setShowJoinCourse(true)}
+              className="btn-secondary flex items-center space-x-2"
+            >
+              <FiUsers className="w-5 h-5" />
+              <span>Join Course</span>
+            </button>
+            <button
+              onClick={() => setShowCreateCourse(true)}
+              className="btn-primary flex items-center space-x-2"
+            >
+              <FiPlus className="w-5 h-5" />
+              <span>New Course</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Create Course Modal */}
       {showCreateCourse && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4">Create New Course</h2>
+        <div className="fixed inset-0 modal-backdrop flex items-center justify-center z-50 px-4">
+          <div className="glass-strong rounded-2xl p-8 w-full max-w-md animate-fadeIn">
+            <h2 className="text-3xl font-bold mb-6 text-white">Create New Course</h2>
             <form onSubmit={handleCreateCourse}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Course Name
                 </label>
                 <input
                   type="text"
                   value={courseName}
                   onChange={(e) => setCourseName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full"
                   placeholder="e.g., Calculus I - Fall 2024"
                   autoFocus
                   required
@@ -147,14 +149,14 @@ export function CoursesPage() {
                 <button
                   type="submit"
                   disabled={createCourseMutation.isPending}
-                  className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  className="btn-primary flex-1 disabled:opacity-50"
                 >
                   {createCourseMutation.isPending ? 'Creating...' : 'Create Course'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowCreateCourse(false)}
-                  className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300"
+                  className="btn-secondary flex-1"
                 >
                   Cancel
                 </button>
@@ -166,38 +168,38 @@ export function CoursesPage() {
 
       {/* Join Course Modal */}
       {showJoinCourse && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-2">Join a Course</h2>
-            <p className="text-gray-600 text-sm mb-4">
+        <div className="fixed inset-0 modal-backdrop flex items-center justify-center z-50 px-4">
+          <div className="glass-strong rounded-2xl p-8 w-full max-w-md animate-fadeIn">
+            <h2 className="text-3xl font-bold mb-2 text-white">Join a Course</h2>
+            <p className="text-gray-400 mb-6">
               Enter the course ID provided by your instructor or classmate
             </p>
             <form onSubmit={handleJoinCourse}>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Course ID
                 </label>
                 <input
                   type="text"
                   value={courseCode}
                   onChange={(e) => setCourseCode(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                  className="w-full font-mono"
                   placeholder="clxxxxxxxxxxxxxx"
                   autoFocus
                   required
                 />
-                <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                  <p className="text-xs text-blue-800">
+                <div className="mt-3 p-4 glass rounded-xl border border-blue-500/30">
+                  <p className="text-xs text-blue-300">
                     <strong>💡 Tip:</strong> Course IDs look like "clxxxxxxxxxxxxxx" (starts with "cl"). 
                     Ask your instructor or check the course card's copy button.
                   </p>
                 </div>
               </div>
-              <div className="flex space-x-3">
+              <div className="flex space-x-3 mt-6">
                 <button
                   type="submit"
                   disabled={joinMutation.isPending}
-                  className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center"
+                  className="btn-primary flex-1 disabled:opacity-50 flex items-center justify-center"
                 >
                   {joinMutation.isPending ? (
                     <>
@@ -214,7 +216,7 @@ export function CoursesPage() {
                     setShowJoinCourse(false);
                     setCourseCode('');
                   }}
-                  className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300"
+                  className="btn-secondary flex-1"
                 >
                   Cancel
                 </button>
@@ -226,20 +228,22 @@ export function CoursesPage() {
 
       {/* Course List */}
       {isLoading ? (
-        <div className="text-center py-12">
-          <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="mt-2 text-gray-600">Loading courses...</p>
+        <div className="card p-12 text-center">
+          <div className="inline-block w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="mt-4 text-gray-400">Loading courses...</p>
         </div>
       ) : courses.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-12 text-center">
-          <FiBook className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-xl font-bold text-gray-900 mb-2">No Courses Yet</h3>
-          <p className="text-gray-600 mb-6">
+        <div className="card p-16 text-center">
+          <div className="inline-block mb-6 animate-float">
+            <FiBook className="w-20 h-20 text-gray-600" />
+          </div>
+          <h3 className="text-2xl font-bold text-white mb-3">No Courses Yet</h3>
+          <p className="text-gray-400 mb-8 max-w-md mx-auto">
             Create your first course to start building collaborative textbooks
           </p>
           <button
             onClick={() => setShowCreateCourse(true)}
-            className="inline-flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700"
+            className="btn-primary inline-flex items-center space-x-2"
           >
             <FiPlus className="w-5 h-5" />
             <span>Create Your First Course</span>
@@ -250,106 +254,122 @@ export function CoursesPage() {
           {courses.map((course: any) => (
             <div
               key={course.id}
-              className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6"
+              className="card p-6 group relative overflow-hidden"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="text-xl font-bold text-gray-900">{course.name}</h3>
-                    <RoleBadge role={course.userRole} />
+              {/* Glow effect on hover */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-cyan-500/0 group-hover:from-blue-500/5 group-hover:to-cyan-500/5 transition-all duration-500"></div>
+              
+              <div className="relative z-10">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">
+                        {course.name}
+                      </h3>
+                      <RoleBadge role={course.userRole} />
+                    </div>
+                    <p className="text-sm text-gray-400">
+                      Created by {course.owner.name}
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-600">
-                    Created by {course.owner.name}
-                  </p>
-                </div>
-                {(course.userRole === 'OWNER' || course.userRole === 'ADMIN') && (
-                  <button
-                    onClick={() => handleCopyCourseId(course.id)}
-                    className={`p-2 transition-colors ${
-                      copiedId === course.id 
-                        ? 'text-green-600' 
-                        : 'text-gray-400 hover:text-gray-600'
-                    }`}
-                    title="Copy Course ID"
-                  >
-                    {copiedId === course.id ? (
-                      <FiCheck className="w-4 h-4" />
-                    ) : (
-                      <FiCopy className="w-4 h-4" />
-                    )}
-                  </button>
-                )}
-              </div>
-
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center text-sm text-gray-600">
-                  <FiFileText className="w-4 h-4 mr-2" />
-                  <span>{course._count?.modules || 0} modules</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <FiUsers className="w-4 h-4 mr-2" />
-                  <span>{course._count?.memberships || 0} members</span>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex space-x-2">
-                  <Link
-                    to={`/modules?courseId=${course.id}`}
-                    className="flex-1 text-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm"
-                  >
-                    View Modules
-                  </Link>
-                  <Link
-                    to={`/builder?courseId=${course.id}`}
-                    className="flex-1 text-center bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 text-sm"
-                  >
-                    Build Textbook
-                  </Link>
-                </div>
-                {(course.userRole === 'OWNER' || course.userRole === 'ADMIN') && (
-                  <Link
-                    to={`/courses/${course.id}/members`}
-                    className="w-full text-center bg-purple-50 text-purple-700 px-4 py-2 rounded-md hover:bg-purple-100 text-sm border border-purple-200 flex items-center justify-center space-x-1"
-                  >
-                    <FiUsers className="w-4 h-4" />
-                    <span>Manage Members</span>
-                  </Link>
-                )}
-              </div>
-
-              {(course.userRole === 'OWNER' || course.userRole === 'ADMIN') && (
-                <div className="mt-3 pt-3 border-t border-gray-200">
-                  <p className="text-xs text-gray-500 mb-1">
-                    <strong>Share this ID with students:</strong>
-                  </p>
-                  <div className="flex items-center space-x-2 bg-gray-50 p-2 rounded">
-                    <code className="flex-1 text-xs font-mono text-gray-700 overflow-x-auto">
-                      {course.id}
-                    </code>
+                  {(course.userRole === 'OWNER' || course.userRole === 'ADMIN') && (
                     <button
                       onClick={() => handleCopyCourseId(course.id)}
-                      className={`px-2 py-1 text-xs rounded transition-colors flex items-center space-x-1 ${
-                        copiedId === course.id
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                      className={`p-2 rounded-lg transition-all ${
+                        copiedId === course.id 
+                          ? 'text-green-400 bg-green-500/10' 
+                          : 'text-gray-400 hover:text-white hover:bg-white/10'
                       }`}
+                      title="Copy Course ID"
                     >
                       {copiedId === course.id ? (
-                        <>
-                          <FiCheck className="w-3 h-3" />
-                          <span>Copied!</span>
-                        </>
+                        <FiCheck className="w-4 h-4" />
                       ) : (
-                        <>
-                          <FiCopy className="w-3 h-3" />
-                          <span>Copy</span>
-                        </>
+                        <FiCopy className="w-4 h-4" />
                       )}
                     </button>
+                  )}
+                </div>
+
+                <div className="space-y-3 mb-4">
+                  <div className="flex items-center text-sm text-gray-400">
+                    <div className="p-2 rounded-lg bg-blue-500/10 mr-3">
+                      <FiFileText className="w-4 h-4 text-blue-400" />
+                    </div>
+                    <span>{course._count?.modules || 0} modules</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-400">
+                    <div className="p-2 rounded-lg bg-cyan-500/10 mr-3">
+                      <FiUsers className="w-4 h-4 text-cyan-400" />
+                    </div>
+                    <span>{course._count?.memberships || 0} members</span>
                   </div>
                 </div>
-              )}
+
+                {/* Divider */}
+                <div className="divider-glow my-4"></div>
+
+                <div className="space-y-2">
+                  <div className="flex space-x-2">
+                    <Link
+                      to={`/modules?courseId=${course.id}`}
+                      className="btn-primary flex-1 text-center text-sm flex items-center justify-center space-x-1"
+                    >
+                      <FiFileText className="w-4 h-4" />
+                      <span>Modules</span>
+                    </Link>
+                    <Link
+                      to={`/builder?courseId=${course.id}`}
+                      className="btn-secondary flex-1 text-center text-sm flex items-center justify-center space-x-1"
+                    >
+                      <FiZap className="w-4 h-4" />
+                      <span>Build</span>
+                    </Link>
+                  </div>
+                  {(course.userRole === 'OWNER' || course.userRole === 'ADMIN') && (
+                    <Link
+                      to={`/courses/${course.id}/members`}
+                      className="w-full text-center glass px-4 py-2 rounded-xl text-sm border border-violet-500/30 flex items-center justify-center space-x-2 hover:bg-violet-500/10 transition-all group"
+                    >
+                      <FiShield className="w-4 h-4 text-violet-400" />
+                      <span className="text-violet-300 font-medium">Manage Members</span>
+                    </Link>
+                  )}
+                </div>
+
+                {(course.userRole === 'OWNER' || course.userRole === 'ADMIN') && (
+                  <div className="mt-4 pt-4 border-t border-white/10">
+                    <p className="text-xs text-gray-500 mb-2 font-semibold">
+                      Share this ID with students:
+                    </p>
+                    <div className="flex items-center space-x-2 glass rounded-lg p-3">
+                      <code className="flex-1 text-xs font-mono text-gray-300 overflow-x-auto">
+                        {course.id}
+                      </code>
+                      <button
+                        onClick={() => handleCopyCourseId(course.id)}
+                        className={`px-3 py-1.5 text-xs rounded-lg transition-all flex items-center space-x-1 font-medium ${
+                          copiedId === course.id
+                            ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+                            : 'bg-blue-500/20 text-blue-300 border border-blue-500/30 hover:bg-blue-500/30'
+                        }`}
+                      >
+                        {copiedId === course.id ? (
+                          <>
+                            <FiCheck className="w-3 h-3" />
+                            <span>Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <FiCopy className="w-3 h-3" />
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -357,4 +377,3 @@ export function CoursesPage() {
     </div>
   );
 }
-

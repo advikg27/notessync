@@ -15,6 +15,7 @@ model User {
   name                  String
   email                 String    @unique
   passwordHash          String
+  profilePicture        String?
   emailVerified         Boolean   @default(false)
   verificationCode      String?
   verificationExpiry    DateTime?

@@ -347,6 +347,7 @@ export async function courseRoutes(fastify: FastifyInstance) {
               id: true,
               name: true,
               email: true,
+              profilePicture: true,
             },
           },
         },

@@ -31,6 +31,10 @@ export const authApi = {
   me: () => api.get('/auth/me'),
   changePassword: (data: { currentPassword: string; newPassword: string }) =>
     api.post('/auth/change-password', data),
+  uploadProfilePicture: (data: { image: string }) =>
+    api.post('/auth/profile-picture', data),
+  deleteProfilePicture: () =>
+    api.delete('/auth/profile-picture'),
 };
 
 // Module API

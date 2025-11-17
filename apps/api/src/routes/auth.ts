@@ -51,6 +51,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           id: true,
           name: true,
           email: true,
+          profilePicture: true,
           emailVerified: true,
           createdAt: true,
         },
@@ -115,6 +116,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           id: user.id,
           name: user.name,
           email: user.email,
+          profilePicture: user.profilePicture,
         },
         token,
       });
@@ -138,6 +140,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           id: true,
           name: true,
           email: true,
+          profilePicture: true,
           createdAt: true,
         },
       });
@@ -198,6 +201,84 @@ export async function authRoutes(fastify: FastifyInstance) {
       });
 
       return reply.send({ message: 'Password changed successfully' });
+    } catch (error) {
+      fastify.log.error(error);
+      return reply.status(500).send({ error: 'Internal server error' });
+    }
+  });
+
+  // Upload profile picture
+  fastify.post('/profile-picture', {
+    onRequest: [fastify.authenticate],
+  }, async (request, reply) => {
+    try {
+      const { image } = request.body as any;
+
+      if (!image) {
+        return reply.status(400).send({ error: 'Image data required' });
+      }
+
+      // Validate base64 image (should start with data:image/)
+      if (!image.startsWith('data:image/')) {
+        return reply.status(400).send({ error: 'Invalid image format. Must be a base64 encoded image.' });
+      }
+
+      // Check size (limit to ~5MB base64)
+      if (image.length > 7000000) {
+        return reply.status(400).send({ error: 'Image too large. Maximum size is 5MB.' });
+      }
+
+      const userId = (request.user as any).id;
+
+      // Update user profile picture
+      const user = await prisma.user.update({
+        where: { id: userId },
+        data: {
+          profilePicture: image,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profilePicture: true,
+        },
+      });
+
+      return reply.send({ 
+        message: 'Profile picture uploaded successfully',
+        user,
+      });
+    } catch (error) {
+      fastify.log.error(error);
+      return reply.status(500).send({ error: 'Internal server error' });
+    }
+  });
+
+  // Delete profile picture
+  fastify.delete('/profile-picture', {
+    onRequest: [fastify.authenticate],
+  }, async (request, reply) => {
+    try {
+      const userId = (request.user as any).id;
+
+      // Remove profile picture
+      const user = await prisma.user.update({
+        where: { id: userId },
+        data: {
+          profilePicture: null,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profilePicture: true,
+        },
+      });
+
+      return reply.send({ 
+        message: 'Profile picture deleted successfully',
+        user,
+      });
     } catch (error) {
       fastify.log.error(error);
       return reply.status(500).send({ error: 'Internal server error' });

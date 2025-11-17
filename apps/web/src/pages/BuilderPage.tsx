@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { moduleApi, compilerApi, courseApi } from '../utils/api';
-import { FiPlus, FiTrash2, FiDownload, FiArrowUp, FiArrowDown } from 'react-icons/fi';
+import { FiPlus, FiTrash2, FiDownload, FiArrowUp, FiArrowDown, FiZap, FiPackage } from 'react-icons/fi';
 
 export function BuilderPage() {
   const [searchParams] = useSearchParams();
@@ -104,38 +104,45 @@ export function BuilderPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Textbook Builder</h1>
-        <p className="text-gray-600">
-          Select and arrange modules to compile into a textbook
+      <div className="card p-8 radial-glow">
+        <div className="flex items-center space-x-3 mb-2">
+          <FiZap className="w-10 h-10 text-blue-500 glow-blue animate-pulse-glow" />
+          <h1 className="text-4xl font-bold text-white">Textbook Builder</h1>
+        </div>
+        <p className="text-gray-400 text-lg">
+          Select and arrange modules to compile into a beautiful textbook
         </p>
       </div>
 
       {/* Configuration */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Configuration</h2>
+      <div className="card p-6">
+        <h2 className="text-2xl font-bold text-white mb-6 flex items-center space-x-2">
+          <FiPackage className="w-6 h-6 text-cyan-400" />
+          <span>Configuration</span>
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Textbook Title
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full"
+              placeholder="Enter textbook title"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Course
             </label>
             <select
               value={selectedCourse}
               onChange={(e) => setSelectedCourse(e.target.value)}
               disabled={!!courseIdFromUrl}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">Select a course</option>
               {courses.map((course: any) => (
@@ -147,13 +154,13 @@ export function BuilderPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Output Format
             </label>
             <select
               value={format}
               onChange={(e) => setFormat(e.target.value as 'html' | 'pdf')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full"
             >
               <option value="pdf">PDF</option>
               <option value="html">HTML</option>
@@ -162,40 +169,42 @@ export function BuilderPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Available Modules */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">Available Modules</h2>
+        <div className="card overflow-hidden">
+          <div className="px-6 py-4 border-b border-white/10 bg-white/5">
+            <h2 className="text-xl font-bold text-white">Available Modules</h2>
           </div>
           <div className="p-4 max-h-[600px] overflow-y-auto">
             {!selectedCourse ? (
-              <p className="text-center text-gray-500 py-8">
-                Select a course to see available modules
-              </p>
+              <div className="text-center py-12">
+                <FiPackage className="w-16 h-16 mx-auto mb-4 text-gray-600 animate-float" />
+                <p className="text-gray-400">Select a course to see available modules</p>
+              </div>
             ) : modules.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">
-                No modules found in this course
-              </p>
+              <div className="text-center py-12">
+                <FiPackage className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+                <p className="text-gray-400">No modules found in this course</p>
+              </div>
             ) : (
               <div className="space-y-2">
                 {modules.map((module: any) => (
                   <div
                     key={module.id}
-                    className="flex items-center justify-between p-3 border border-gray-200 rounded-md hover:bg-gray-50"
+                    className="glass p-4 rounded-xl flex items-center justify-between group hover:border-blue-500/30 transition-all"
                   >
                     <div className="flex-1">
                       <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 text-xs font-medium rounded ${getTypeColor(module.type)}`}>
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-lg ${getTypeColor(module.type)}`}>
                           {module.type}
                         </span>
-                        <span className="font-medium text-gray-900">{module.title}</span>
+                        <span className="font-medium text-white">{module.title}</span>
                       </div>
                     </div>
                     <button
                       onClick={() => handleAddModule(module.id)}
                       disabled={selectedModules.includes(module.id)}
-                      className="flex items-center space-x-1 px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="btn-primary text-sm py-2 px-4 disabled:opacity-30 disabled:cursor-not-allowed flex items-center space-x-1"
                     >
                       <FiPlus className="w-4 h-4" />
                       <span>Add</span>
@@ -208,17 +217,19 @@ export function BuilderPage() {
         </div>
 
         {/* Selected Modules */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">
+        <div className="card overflow-hidden">
+          <div className="px-6 py-4 border-b border-white/10 bg-white/5">
+            <h2 className="text-xl font-bold text-white">
               Selected Modules ({selectedModules.length})
             </h2>
           </div>
           <div className="p-4 max-h-[600px] overflow-y-auto">
             {selectedModules.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">
-                No modules selected. Add modules from the left panel.
-              </p>
+              <div className="text-center py-12">
+                <FiPackage className="w-16 h-16 mx-auto mb-4 text-gray-600 animate-float" />
+                <p className="text-gray-400">No modules selected.</p>
+                <p className="text-gray-500 text-sm mt-2">Add modules from the left panel.</p>
+              </div>
             ) : (
               <div className="space-y-2">
                 {selectedModules.map((moduleId, index) => {
@@ -228,37 +239,40 @@ export function BuilderPage() {
                   return (
                     <div
                       key={moduleId}
-                      className="flex items-center justify-between p-3 border border-gray-200 rounded-md bg-blue-50"
+                      className="glass-strong p-4 rounded-xl flex items-center justify-between border border-blue-500/20"
                     >
                       <div className="flex-1">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-bold text-gray-500">
+                        <div className="flex items-center space-x-3">
+                          <span className="text-lg font-bold text-cyan-400 min-w-[2rem]">
                             {index + 1}.
                           </span>
-                          <span className={`px-2 py-1 text-xs font-medium rounded ${getTypeColor(module.type)}`}>
+                          <span className={`px-2 py-1 text-xs font-semibold rounded-lg ${getTypeColor(module.type)}`}>
                             {module.type}
                           </span>
-                          <span className="font-medium text-gray-900">{module.title}</span>
+                          <span className="font-medium text-white">{module.title}</span>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-1">
+                      <div className="flex items-center space-x-1 ml-4">
                         <button
                           onClick={() => handleMoveUp(index)}
                           disabled={index === 0}
-                          className="p-1 text-gray-600 hover:text-gray-900 disabled:opacity-30"
+                          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed transition-all"
+                          title="Move up"
                         >
                           <FiArrowUp className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleMoveDown(index)}
                           disabled={index === selectedModules.length - 1}
-                          className="p-1 text-gray-600 hover:text-gray-900 disabled:opacity-30"
+                          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed transition-all"
+                          title="Move down"
                         >
                           <FiArrowDown className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleRemoveModule(moduleId)}
-                          className="p-1 text-red-600 hover:text-red-800"
+                          className="p-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all"
+                          title="Remove"
                         >
                           <FiTrash2 className="w-4 h-4" />
                         </button>
@@ -277,14 +291,17 @@ export function BuilderPage() {
         <button
           onClick={handleCompile}
           disabled={selectedModules.length === 0 || compileMutation.isPending}
-          className="flex items-center space-x-2 bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 text-lg font-medium"
+          className="btn-primary text-lg py-4 px-10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-3 group"
         >
-          <FiDownload className="w-5 h-5" />
+          <FiDownload className="w-6 h-6 group-hover:animate-bounce" />
           <span>
             {compileMutation.isPending
               ? 'Compiling...'
               : `Compile to ${format.toUpperCase()}`}
           </span>
+          {compileMutation.isPending && (
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          )}
         </button>
       </div>
     </div>
@@ -293,13 +310,12 @@ export function BuilderPage() {
 
 function getTypeColor(type: string): string {
   const colors: Record<string, string> = {
-    definition: 'bg-green-100 text-green-800',
-    example: 'bg-orange-100 text-orange-800',
-    explanation: 'bg-purple-100 text-purple-800',
-    diagram: 'bg-pink-100 text-pink-800',
-    proof: 'bg-red-100 text-red-800',
-    problem: 'bg-cyan-100 text-cyan-800',
+    definition: 'bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-300 border border-green-500/30',
+    example: 'bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-300 border border-orange-500/30',
+    explanation: 'bg-gradient-to-r from-purple-500/20 to-violet-500/20 text-purple-300 border border-purple-500/30',
+    diagram: 'bg-gradient-to-r from-pink-500/20 to-rose-500/20 text-pink-300 border border-pink-500/30',
+    proof: 'bg-gradient-to-r from-red-500/20 to-rose-500/20 text-red-300 border border-red-500/30',
+    problem: 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-300 border border-cyan-500/30',
   };
-  return colors[type] || 'bg-gray-100 text-gray-800';
+  return colors[type] || 'bg-gradient-to-r from-gray-500/20 to-slate-500/20 text-gray-300 border border-gray-500/30';
 }
-

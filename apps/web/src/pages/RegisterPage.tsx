@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { authApi, api } from '../utils/api';
 import { clearAllUserData } from '../utils/clearUserData';
-import { FiBook, FiMail, FiArrowLeft } from 'react-icons/fi';
+import { FiZap, FiMail, FiArrowLeft, FiUser, FiLock, FiCheck, FiArrowRight } from 'react-icons/fi';
 
 export function RegisterPage() {
   const [step, setStep] = useState<'register' | 'verify'>('register');
@@ -126,172 +126,210 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
-        <div className="flex justify-center mb-6">
-          <FiBook className="w-16 h-16 text-blue-600" />
+    <div className="min-h-screen flex items-center justify-center px-4 py-12">
+      <div className="max-w-md w-full">
+        {/* Logo */}
+        <div className="text-center mb-8 animate-fadeIn">
+          <div className="inline-block relative mb-4 animate-float">
+            <div className="absolute inset-0 bg-blue-500 blur-2xl opacity-40"></div>
+            <FiZap className="relative w-20 h-20 text-blue-500 glow-blue" />
+          </div>
+          <h1 className="text-5xl font-bold mb-2 bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent">
+            {step === 'register' ? 'Create Account' : 'Verify Email'}
+          </h1>
+          <p className="text-gray-400 text-lg">
+            {step === 'register' 
+              ? 'Join NoteSync and start collaborating'
+              : 'Enter the code sent to your email'
+            }
+          </p>
         </div>
-        
-        <h1 className="text-3xl font-bold text-center text-gray-900 mb-2">
-          {step === 'register' ? 'Create Account' : 'Verify Email'}
-        </h1>
-        <p className="text-center text-gray-600 mb-8">
-          {step === 'register' 
-            ? 'Join Textbook Compiler and start collaborating'
-            : 'Enter the verification code sent to your email'
-          }
-        </p>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
-
-        {success && (
-          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
-            {success}
-          </div>
-        )}
-
-        {step === 'register' ? (
-          <>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="your@email.com"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Min 6 characters"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Confirm Password
-                </label>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-              >
-                {loading ? 'Creating account...' : 'Sign Up'}
-              </button>
-            </form>
-
-            <p className="text-center text-gray-600 mt-6">
-              Already have an account?{' '}
-              <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">
-                Sign in
-              </Link>
-            </p>
-          </>
-        ) : (
-          <>
-            <form onSubmit={handleVerify} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Verification Code
-                </label>
-                <input
-                  type="text"
-                  value={userCode}
-                  onChange={(e) => setUserCode(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-2xl tracking-widest"
-                  placeholder="000000"
-                  maxLength={6}
-                  pattern="[0-9]{6}"
-                  autoFocus
-                  required
-                />
-                <p className="text-sm text-gray-500 mt-2">
-                  Sent to: <strong>{email}</strong>
-                </p>
-                {verificationCode && (
-                  <p className="text-sm text-blue-600 mt-1">
-                    Dev mode code: <strong>{verificationCode}</strong>
-                  </p>
-                )}
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-              >
-                {loading ? 'Verifying...' : 'Verify Email'}
-              </button>
-            </form>
-
-            <div className="mt-4 space-y-2">
-              <button
-                onClick={handleResendCode}
-                disabled={loading}
-                className="w-full text-sm text-blue-600 hover:text-blue-700 disabled:opacity-50"
-              >
-                <FiMail className="inline mr-1" />
-                Resend verification code
-              </button>
-              <button
-                onClick={handleSkipVerification}
-                className="w-full text-sm text-gray-600 hover:text-gray-700"
-              >
-                Skip for now (you can verify later)
-              </button>
+        {/* Card */}
+        <div className="glass-strong rounded-2xl p-8 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+          {error && (
+            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 animate-fadeIn">
+              <p className="text-red-300 text-sm">{error}</p>
             </div>
+          )}
 
-            <p className="text-center text-gray-600 mt-6 text-sm">
-              <button
-                onClick={() => setStep('register')}
-                className="text-blue-600 hover:text-blue-700"
-              >
-                <FiArrowLeft className="inline mr-1" />
-                Back to registration
-              </button>
-            </p>
-          </>
-        )}
+          {success && (
+            <div className="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/30 animate-fadeIn">
+              <p className="text-green-300 text-sm">{success}</p>
+            </div>
+          )}
+
+          {step === 'register' ? (
+            <>
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Name
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <FiUser className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full pl-12"
+                      placeholder="Your full name"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Email
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <FiMail className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full pl-12"
+                      placeholder="your@email.com"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <FiLock className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-12"
+                      placeholder="Min 6 characters"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <FiCheck className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full pl-12"
+                      placeholder="Confirm your password"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-primary w-full flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed group"
+                >
+                  <span>{loading ? 'Creating account...' : 'Sign Up'}</span>
+                  {!loading && <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                  {loading && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+                </button>
+              </form>
+
+              <div className="divider-glow my-6"></div>
+
+              <p className="text-center text-gray-400">
+                Already have an account?{' '}
+                <Link to="/login" className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors">
+                  Sign in
+                </Link>
+              </p>
+            </>
+          ) : (
+            <>
+              <form onSubmit={handleVerify} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Verification Code
+                  </label>
+                  <input
+                    type="text"
+                    value={userCode}
+                    onChange={(e) => setUserCode(e.target.value)}
+                    className="w-full text-center text-3xl tracking-[0.5em] font-mono"
+                    placeholder="000000"
+                    maxLength={6}
+                    pattern="[0-9]{6}"
+                    autoFocus
+                    required
+                  />
+                  <p className="text-sm text-gray-400 mt-3 text-center">
+                    Sent to: <strong className="text-white">{email}</strong>
+                  </p>
+                  {verificationCode && (
+                    <div className="mt-3 p-3 glass rounded-xl border border-blue-500/30">
+                      <p className="text-sm text-blue-300 text-center">
+                        Dev mode code: <strong className="text-blue-200">{verificationCode}</strong>
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-primary w-full flex items-center justify-center space-x-2 disabled:opacity-50 group"
+                >
+                  <span>{loading ? 'Verifying...' : 'Verify Email'}</span>
+                  {!loading && <FiCheck className="w-5 h-5" />}
+                  {loading && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+                </button>
+              </form>
+
+              <div className="mt-6 space-y-3">
+                <button
+                  onClick={handleResendCode}
+                  disabled={loading}
+                  className="w-full btn-secondary flex items-center justify-center space-x-2 disabled:opacity-50"
+                >
+                  <FiMail className="w-4 h-4" />
+                  <span>Resend verification code</span>
+                </button>
+                <button
+                  onClick={handleSkipVerification}
+                  className="w-full text-sm text-gray-400 hover:text-white transition-colors"
+                >
+                  Skip for now (you can verify later)
+                </button>
+              </div>
+
+              <div className="divider-glow my-6"></div>
+
+              <p className="text-center text-sm">
+                <button
+                  onClick={() => setStep('register')}
+                  className="text-cyan-400 hover:text-cyan-300 transition-colors inline-flex items-center space-x-1"
+                >
+                  <FiArrowLeft className="w-4 h-4" />
+                  <span>Back to registration</span>
+                </button>
+              </p>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
